@@ -21,16 +21,16 @@ fi
 
 # create the patch file to apply to the source of the snd-hda-scodec-cs35l41 kernel module
 tee "/usr/src/${KERNEL_MODULE_NAME}-${DKMS_MODULE_VERSION}/cs35l41_hda.patch" <<'EOF'
---- sound/pci/hda/cs35l41_hda.c.orig
-+++ sound/pci/hda/cs35l41_hda.c
-@@ -1244,6 +1244,10 @@
+--- sound/pci/hda/cs35l41_hda.c.orig	2023-11-28 22:17:06.335637810 +0100
++++ sound/pci/hda/cs35l41_hda.c	2023-11-28 22:19:36.158111617 +0100
+@@ -1395,6 +1395,10 @@
  		hw_cfg->bst_type = CS35L41_EXT_BOOST;
  		hw_cfg->gpio1.func = CS35l41_VSPK_SWITCH;
  		hw_cfg->gpio1.valid = true;
-+  } else if (strncmp(hid, "CSC3551", 7) == 0) {
-+     hw_cfg->bst_type = CS35L41_EXT_BOOST;
-+     hw_cfg->gpio1.func = CS35l41_VSPK_SWITCH;
-+     hw_cfg->gpio1.valid = true;
++	} else if (strncmp(hid, "CSC3551", 7) == 0) {
++		hw_cfg->bst_type = CS35L41_EXT_BOOST;
++		hw_cfg->gpio1.func = CS35l41_VSPK_SWITCH;
++		hw_cfg->gpio1.valid = true;
  	} else {
  		/*
  		 * Note: CLSA010(0/1) are special cases which use a slightly different design.
