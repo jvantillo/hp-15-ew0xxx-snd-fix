@@ -28,7 +28,7 @@ SOURCE_VERSION_STRING="${SOURCE_MAJOR_VERSION}.${SOURCE_MINOR_VERSION}$( [ -n "$
 #tar -xf "linux-${SOURCE_VERSION_STRING}.tar."* "linux-${SOURCE_VERSION_STRING}/${1}" "--xform=s,linux-${SOURCE_VERSION_STRING}/$1,.,"
 
 pwd
-rm -rf linux-hwe-6.2-6.2.0/
+rm -rf linux-hwe-6.5-6.5.0/
 rm -f *.c *.h *.obj
 apt-get -d source linux-image-unsigned-$(uname -r)   # todo: make this the real version
 apt-get source linux-image-unsigned-$(uname -r) > /dev/null   # hide extract spam
@@ -39,7 +39,7 @@ apt-get source linux-image-unsigned-$(uname -r) > /dev/null   # hide extract spa
 #ls -la ./
 #ls -la linux-hwe-6.2-6.2.0/${1}/
 #echo "Copying from 'linux-hwe-6.2-6.2.0/${1}/*' to '$(pwd)'"
-cp -R linux-hwe-6.2-6.2.0/${1}/* ./
+cp -R linux-hwe-6.5-6.5.0/${1}/* ./
 ls -la
 
 for i in `ls *.patch`; do

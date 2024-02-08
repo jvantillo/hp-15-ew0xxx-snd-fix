@@ -21,19 +21,35 @@ fi
 
 # create the patch file to apply to the source of the snd-hda-scodec-cs35l41 kernel module
 tee "/usr/src/${KERNEL_MODULE_NAME}-${DKMS_MODULE_VERSION}/cs35l41_hda.patch" <<'EOF'
---- sound/pci/hda/cs35l41_hda.c.orig	2023-11-28 22:17:06.335637810 +0100
-+++ sound/pci/hda/cs35l41_hda.c	2023-11-28 22:19:36.158111617 +0100
-@@ -1395,6 +1395,10 @@
- 		hw_cfg->bst_type = CS35L41_EXT_BOOST;
- 		hw_cfg->gpio1.func = CS35l41_VSPK_SWITCH;
- 		hw_cfg->gpio1.valid = true;
-+	} else if (strncmp(hid, "CSC3551", 7) == 0) {
-+		hw_cfg->bst_type = CS35L41_EXT_BOOST;
-+		hw_cfg->gpio1.func = CS35l41_VSPK_SWITCH;
-+		hw_cfg->gpio1.valid = true;
- 	} else {
- 		/*
- 		 * Note: CLSA010(0/1) are special cases which use a slightly different design.
+--- sound/pci/hda/cs35l41_hda.c.orig	2024-02-08 21:04:31.873567500 +0100
++++ sound/pci/hda/cs35l41_hda.c	2024-02-08 21:24:32.768596507 +0100
+@@ -1611,6 +1611,26 @@
+ 
+ 	property = "cirrus,dev-index";
+ 	ret = device_property_count_u32(physdev, property);
++	if (ret <= 0) {
++		if (strncmp(hid, "CSC3551", 7) == 0) {
++			cs35l41->index = id == 0x40 ? 0 : 1;
++			cs35l41->channel_index = 0;
++			cs35l41->reset_gpio = gpiod_get_index(physdev, NULL, 0, GPIOD_OUT_HIGH);
++			cs35l41->speaker_id = cs35l41_get_speaker_id(physdev, 0, 0, 2);
++			hw_cfg->spk_pos = cs35l41->index;
++			hw_cfg->gpio2.func = CS35L41_INTERRUPT;
++			hw_cfg->gpio2.valid = true;
++			hw_cfg->valid = true;
++
++			hw_cfg->bst_type = CS35L41_EXT_BOOST;
++			hw_cfg->gpio1.func = CS35l41_VSPK_SWITCH;
++			hw_cfg->gpio1.valid = true;
++
++			ret = 0;
++			goto put_physdev;
++ 		}
++	}
++
+ 	if (ret <= 0)
+ 		goto err;
+ 
 EOF
 
 "${BIN_ABSPATH}/dkms-module_build.sh" "${KERNEL_MODULE_NAME}" "${DKMS_MODULE_VERSION}"
